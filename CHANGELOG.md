@@ -10,6 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 This section accumulates work toward the **2.3.0** milestone
 ([2.3.0](https://github.com/bytedance/deer-flow/milestone/4)).
 
+### Added
+
+- **community:** Add Perplexity as an opt-in `web_search` provider
+  (`deerflow.community.perplexity`) backed by the Perplexity Search API
+  (`POST https://api.perplexity.ai/search`). It requires `PERPLEXITY_API_KEY`
+  or the tool's `api_key` config, returns title, URL, snippet and date per
+  result, maps `time_range` to `search_recency_filter`, and caps
+  `max_results` at 20 after shared coercion. Wired into `make setup` and
+  `make doctor`.
+
 ### Fixed
 
 - **dev:** `scripts/dev_multi_instance.sh logs all` now prints the nginx logs

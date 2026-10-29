@@ -724,6 +724,14 @@ SEARCH_PROVIDERS: list[SearchProvider] = [
         extra_config={"max_results": 5},
     ),
     SearchProvider(
+        name="perplexity",
+        display_name="Perplexity",
+        description="Ranked web results with snippets and dates, API key required",
+        use="deerflow.community.perplexity.tools:web_search_tool",
+        env_var="PERPLEXITY_API_KEY",
+        extra_config={"max_results": 5},
+    ),
+    SearchProvider(
         name="youcom",
         display_name="You.com",
         description="Own index with extracted page snippets, free tier needs no key",

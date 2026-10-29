@@ -110,7 +110,7 @@ tools:
 
 ### 网络搜索
 
-<Tabs items={["DuckDuckGo（默认）", "Tavily", "Brave", "Serply", "Exa", "InfoQuest", "Firecrawl", "GroundRoute", "Sofya", "You.com"]}>
+<Tabs items={["DuckDuckGo（默认）", "Tavily", "Brave", "Serply", "Exa", "InfoQuest", "Firecrawl", "GroundRoute", "Sofya", "Perplexity", "You.com"]}>
   <Tabs.Tab>
 ```yaml
 tools:
@@ -199,6 +199,17 @@ tools:
     api_key: $SOFYA_API_KEY
 ```
 搜索结果包含每个页面的正文内容，而不仅是摘要。需要 [Sofya](https://sofya.co) API Key，`max_results` 上限为 20，每条结果的正文长度上限由 `contents_max_characters` 控制（默认 2000，设为 0 则不限制）。同时支持 `web_fetch`。
+  </Tabs.Tab>
+  <Tabs.Tab>
+```yaml
+tools:
+  - use: deerflow.community.perplexity.tools:web_search_tool
+    api_key: $PERPLEXITY_API_KEY
+```
+使用 Perplexity Search API 返回排序后的结果，每条结果附带提取的片段和发布日期。需要 [Perplexity](https://www.perplexity.ai/account/api) API Key，`max_results` 上限为 20，`time_range` 映射为 `search_recency_filter`。
+
+无需额外依赖。
+
   </Tabs.Tab>
   <Tabs.Tab>
 ```yaml

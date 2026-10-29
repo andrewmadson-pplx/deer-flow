@@ -9,6 +9,7 @@ re-deciding in each file what "invalid" means.
 
 You.com also uses this shared coercion, then applies its 100-result cap to
 the normalized count before sending the request.
+Perplexity does the same with the Search API's 20-result cap.
 
 Other providers retain local normalization, including Exa's generic integer
 helper and SearXNG's inline validation; Tavily passes configured values through.
