@@ -109,7 +109,8 @@ This pattern gate does not establish arbitrary provider semantics or change
 deferred providers' validation policy.
 Include You.com in the shared-owner provider checks; it applies its 100-result
 cap after shared normalization. Pin invalid-value defaults and positive count
-bounds through the outbound request in `test_youcom_tools.py`.
+bounds through the outbound request in `test_youcom_tools.py`. Perplexity
+follows the same pattern with its 20-result cap in `test_perplexity_tools.py`.
 
 Mixed-version resume admission in `test_thread_run_idempotency.py` uses a real
 shared SQL repository and an old-column projection. The frozen pre-6499 helper
@@ -219,6 +220,13 @@ The 0033 batch-evidence migration fixture uses the same adapter. Its connection
 contract probes execute the actual migration test setup through SQLAlchemy's
 dialect argument conversion, stopping before database acquisition; the real
 SQLite/PostgreSQL cases still exercise upgrade, downgrade and re-upgrade.
+
+## Batch lease renewal races
+
+`test_batch_lease_lifecycle.py` parks recovery after the per-item expiry SELECT,
+identified by selected item columns; the parent query can contain the same expiry
+predicate. Assert one rejected item UPDATE as well as the preserved row, so an
+empty expiry scan cannot satisfy the concurrency guard.
 
 ## DingTalk stream tasks
 

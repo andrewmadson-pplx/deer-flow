@@ -12,6 +12,19 @@
 本节累积面向 **2.3.0** 里程碑（[2.3.0](https://github.com/bytedance/deer-flow/milestone/4)）的工作。
 截至 2026-10-28，该里程碑已合并 **1068 个拉取请求**。
 
+### 修复
+
+- **开发：** `scripts/dev_multi_instance.sh logs all` 现在除两个 Gateway 日志外也会输出
+  nginx 日志；此前它只输出 Gateway 日志，与不带参数的 `logs` 相同。`logs nginx` 与
+  `logs all` 还会包含 `nginx.log`（nginx 启动命令自身的输出），此前没有任何选项会输出它。
+  ([#7723])
+
+- **记忆：** `GET /api/memory/config` 与 `/api/memory/status` 现在会把 `backend_config`
+  中的凭据值（`api_key`、token、密码、`Authorization` 请求头，任意层级）遮蔽为 `***`。
+  此前它们按加载结果原样返回配置，而 `$VAR` 引用此时已被解析，因此 DeerMem 提取模型的密钥
+  或 Honcho 的 `api_key` 会以明文返回给所有拥有 `memory:read` 的调用方；在默认关闭授权时，
+  这就是所有已登录用户。非机密配置项、`api_key_env` 变量名和未设置的值保持不变。([#7665])
+
 ## [2.2.0] — 2026-10-29
 
 本节累积面向 **2.2.0** 里程碑（[2.2.0](https://github.com/bytedance/deer-flow/milestone/3)）的工作。
@@ -12413,6 +12426,7 @@ DeerFlow 2.0 是围绕"超级智能体"框架的彻底重写，核心包含子�
 [#7017]: https://github.com/bytedance/deer-flow/pull/7017
 [#7018]: https://github.com/bytedance/deer-flow/pull/7018
 [#7020]: https://github.com/bytedance/deer-flow/pull/7020
+[#7022]: https://github.com/bytedance/deer-flow/issues/7022
 [#7023]: https://github.com/bytedance/deer-flow/pull/7023
 [#7024]: https://github.com/bytedance/deer-flow/pull/7024
 [#7031]: https://github.com/bytedance/deer-flow/pull/7031
@@ -12685,3 +12699,5 @@ DeerFlow 2.0 是围绕"超级智能体"框架的彻底重写，核心包含子�
 [#7643]: https://github.com/bytedance/deer-flow/pull/7643
 [#7651]: https://github.com/bytedance/deer-flow/pull/7651
 [#7659]: https://github.com/bytedance/deer-flow/pull/7659
+[#7665]: https://github.com/bytedance/deer-flow/pull/7665
+[#7723]: https://github.com/bytedance/deer-flow/pull/7723

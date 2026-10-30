@@ -161,6 +161,16 @@ def _stub_webz(module, url):
     ], _async(module.web_search_tool)
 
 
+def _stub_perplexity(module, url):
+    data = {"results": [{"title": "t", "url": url, "snippet": "c"}]}
+    transport = httpx.MockTransport(lambda request: httpx.Response(200, json=data))
+    real_client = httpx.AsyncClient
+    return [
+        patch.object(module, "_resolve_tool_settings", return_value=("k", None)),
+        patch.object(module.httpx, "AsyncClient", lambda **kwargs: real_client(transport=transport, **kwargs)),
+    ], _async(module.web_search_tool)
+
+
 _TEXT_SEARCH_STUBS = {
     "tavily": _stub_tavily,
     "exa": _stub_exa,
@@ -176,6 +186,7 @@ _TEXT_SEARCH_STUBS = {
     "brave": _stub_brave,
     "serper": _stub_serper,
     "webz": _stub_webz,
+    "perplexity": _stub_perplexity,
 }
 
 

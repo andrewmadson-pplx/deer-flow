@@ -1774,6 +1774,8 @@ Discovery follows operator-managed directory symlinks, but skips links back to a
 
 Skill Markdown and bundled text resources use UTF-8. Skill-creator CLI and review utilities read and write text explicitly as UTF-8 so localized skills behave consistently across operating systems.
 
+For standalone skill exports, the bundled skill creator's `scripts/package_skill.py` can be run by file path from any directory, or as `python -m scripts.package_skill` from the skill-creator directory. Both entry points validate the skill before writing a `.skill` archive.
+
 Custom-skill writes and security-scan staging preserve submitted line endings
 on every platform, so the scanner checks the bytes that will be stored.
 
@@ -2462,6 +2464,8 @@ Unsent Web UI composer drafts survive page reloads and switching between convers
 
 If an attachment upload reports `success: false`, the Web UI stops the send even when the HTTP response is 200. The upload error is shown and the composer keeps its draft and attachments for correction or retry. Files already accepted by a partially successful upload remain on the server; this does not roll them back.
 
+Document conversion reads the live PDF-converter setting and parses documents in a background worker, keeping configuration-file checks off the Gateway event loop.
+
 The Web UI composer supports `@` references at the cursor or through the `@` button. Search enabled skills, documents in the current project, and other conversations in a grouped picker; selected references appear inline alongside the draft text and can be removed with normal editing. Multiple skills can be selected in one message (up to 16 unique skills); selecting a checked skill again removes it, with each selection checked against the current user registry and agent allowlist. Project files are attached only after ingestion succeeds; conversation references require the `read_conversation` capability and retain its per-run limit. If capability discovery fails, saved conversation references remain intact and sending waits for a successful retry. Polishing preserves complete reference labels when instructions are reordered. The file group also offers local uploads. `/goal`, `/compact`, and legacy `/skill-name` input remain supported.
 
 After picking an inline reference, typing continues immediately after it. Moving the cursor keeps the position you chose, including when editing text beside a reference.
@@ -2791,6 +2795,8 @@ Explicitly enabled nested `task` delegation propagates omitted opaque source IDs
 
 If an item's final lease expires after exhausting the retry budget, the batch reaches a terminal state once all items are terminal: `failed` when none succeeded, or `completed` when at least one succeeded. The item remains `failed` in both cases so partial results stay visible.
 
+Paused batches also reconcile expired attempts after a worker exits. Retryable items remain queued without starting new work until you explicitly resume the batch; exhausted attempts become failed and can be retried individually.
+
 Direct `create_deerflow_agent(...)` integrations can own the same boundary explicitly instead of relying on Gateway startup. Construct one `SubagentRuntime` and share it across every graph in that application; its `max_running`, ordinary per-run total, bound `task` tool, and optional durable-batch tools then use the same caller-owned snapshot and execution controller. A runtime with a batch repository owns a worker and must be started before graph construction and stopped during application shutdown:
 
 ```python
@@ -2982,6 +2988,8 @@ DeerFlow doesn't just *talk* about doing things. It has its own computer.
 Each task gets its own execution environment with a full filesystem view — skills, workspace, uploads, outputs. The agent reads, writes, and edits files. It can view images and, when configured safely, execute shell commands.
 
 The read-before-write gate ties each read mark to that `read_file` call's result, including custom tools returning multi-message `Command` updates. An unrelated result cannot authorize a write after a failed read or hide a successful read.
+
+Deeply nested JSON returned by tools, including `read_file`, keeps its original content when result analysis reaches the JSON parser's depth limit. Explicit tool failures remain errors with an unknown category when depth prevents analysis.
 
 On Linux and macOS, local sandbox `write_file` replacements and `str_replace` stage complete text before replacing the destination, so write, flush or publication errors retain the previous file. Existing write access is checked; ownership, permission bits, ACLs and extended attributes are transferred before writing staging content. Failure to transfer metadata aborts the save. Successful revisions get a fresh modification time, including empty saves; source-descriptor cleanup errors are warnings and do not change the save result. Files with set-id bits, macOS file flags or content-bound Linux privilege attributes are refused unchanged. Replacement requires parent-directory write access and publishes a new inode; other hard links retain the previous version. Symlinks follow the existing path-validation rules. Append writes, other host platforms (including Windows), shell writes and remote providers keep their existing behavior. This is not a concurrent-writer or power-loss recovery guarantee.
 
@@ -3226,6 +3234,8 @@ Then uncomment the `group: browser` tool entries in `config.yaml` (`browser_navi
 
 Existing, non-mock Custom Agent chats expose the same Browser Live controls when browser control is available and the agent either leaves `tool_groups` unrestricted or includes the `browser` group. An explicit tool-group allowlist without `browser` keeps those controls hidden.
 
+Closing a login popup returns browser control to a surviving tab in the same session, preserving cookies and site storage. If every tab closes, the next browser action opens a tab in that same session. Recovered tabs are brought to the front in DeerFlow-managed browsers; CDP-attached Chrome keeps the user's current tab focus.
+
 The workspace Browser Live client negotiates binary JPEG WebSocket frames,
 keeps only the newest pending frame per display refresh, and revokes replaced
 object URLs. Gateway control messages remain JSON, and clients that do not
@@ -3286,6 +3296,11 @@ by sibling deletions or runtime failures (such as unavailable sources or policy 
 become available in the next batch, when rejected additions can be retried.
 
 ### Long-Term Memory
+
+DeerMem trims oversized user/history summaries against the configured token
+counter, including the omission marker and retained facts. Mixed-language text
+does not rely on an average character/token ratio; the existing guaranteed-fact
+allowance remains unchanged.
 
 Settings > Appearance > Language also supplies the preferred language for replies
 and new automatic DeerMem facts and summary updates on subsequent chat turns and
@@ -3497,6 +3512,10 @@ Thread IDs may be supplied by callers and do not have to be UUIDs. Explicit
 IDs must contain 1–64 ASCII letters, digits, hyphens, or underscores
 (`^[A-Za-z0-9_-]{1,64}$`). DeerFlow generates a UUID only when `thread_id` is
 omitted or `None`; an explicitly supplied empty string is invalid.
+Concurrent `POST /api/threads` requests and automatic run metadata creation share
+same-ID admission in one Gateway, preserving the first thread's metadata and status.
+HTTP retries also preserve its current checkpoint. SQL-backed Gateways retain
+duplicate-insert recovery across workers.
 Existing route-addressable threads created under older, looser rules remain
 readable and deletable, but cannot start new runs or create new filesystem or
 sandbox state. Legacy deletion skips local path cleanup when the ID is not
