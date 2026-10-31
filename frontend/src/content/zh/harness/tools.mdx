@@ -110,7 +110,7 @@ tools:
 
 ### 网络搜索
 
-<Tabs items={["DuckDuckGo（默认）", "Tavily", "Brave", "Serply", "Exa", "InfoQuest", "Firecrawl", "GroundRoute", "Sofya", "You.com"]}>
+<Tabs items={["DuckDuckGo（默认）", "Tavily", "Brave", "Serply", "Exa", "InfoQuest", "Firecrawl", "GroundRoute", "Sofya", "You.com", "Perplexity"]}>
   <Tabs.Tab>
 ```yaml
 tools:
@@ -209,6 +209,20 @@ tools:
 返回 You.com 自有索引的结果，每条结果附带从页面提取的片段，而不只是一段元描述。未配置 Key 时使用免密钥端点（免费额度，目前为每天 100 次搜索）；配置 `YDC_API_KEY` 后自动切换到额度更高的完整 Search API。`max_results` 上限为 100。
 
 API Key 可选，可在 [You.com](https://you.com/platform) 获取。
+
+无需额外依赖。
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+```yaml
+tools:
+  - use: deerflow.community.perplexity.tools:web_search_tool
+    api_key: $PERPLEXITY_API_KEY
+    # search_type: web                 # web（默认）或 fast
+    # search_domain_filter: ["example.com", "example.org"]
+    # search_domain_filter: ["-excluded.com"]
+```
+通过 [Perplexity Search API](https://docs.perplexity.ai/docs/search/quickstart) 返回带标题、URL 和摘要的排序网页结果。需要 Perplexity API Key。`max_results` 上限为 20。`search_type: fast` 使用低延迟的网页搜索。`search_domain_filter` 最多接受 20 个域名，且每次请求只能使用一种模式：要么全部为包含的域名，要么全部为排除的域名（每个域名前加 `-`）。Agent 的 `time_range` 参数会映射为 API 的时效性过滤。
 
 无需额外依赖。
 

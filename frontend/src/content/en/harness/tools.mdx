@@ -113,7 +113,7 @@ Community tools connect the agent to external services. They are configured in `
 
 ### Web search
 
-<Tabs items={["DuckDuckGo (default)", "Tavily", "Brave", "Serply", "Exa", "InfoQuest", "Firecrawl", "GroundRoute", "Sofya", "You.com"]}>
+<Tabs items={["DuckDuckGo (default)", "Tavily", "Brave", "Serply", "Exa", "InfoQuest", "Firecrawl", "GroundRoute", "Sofya", "You.com", "Perplexity"]}>
   <Tabs.Tab>
 ```yaml
 tools:
@@ -218,6 +218,20 @@ single meta description. Without a key it uses the keyless endpoint (free tier, 
 limits. `max_results` is capped at 100.
 
 Optional API key from [You.com](https://you.com/platform).
+
+No extra dependency required.
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+```yaml
+tools:
+  - use: deerflow.community.perplexity.tools:web_search_tool
+    api_key: $PERPLEXITY_API_KEY
+    # search_type: web                 # web (default) or fast
+    # search_domain_filter: ["example.com", "example.org"]
+    # search_domain_filter: ["-excluded.com"]
+```
+Ranked web results with title, URL and snippet from the [Perplexity Search API](https://docs.perplexity.ai/docs/search/quickstart). Requires a Perplexity API key. `max_results` is capped at 20. `search_type: fast` uses lower-latency web search. `search_domain_filter` accepts up to 20 domains in one mode per request: either a list of domains to include, or a list of domains to exclude (each prefixed with `-`). The agent's `time_range` argument maps to the API's recency filter.
 
 No extra dependency required.
 
